@@ -5,6 +5,7 @@ import {
     Sparkles, History, Menu, X
 } from 'lucide-react';
 import { useState } from 'react';
+import logoUrl from '../assets/nexus-logo-01.png';
 
 const navItems = [
     { to: '/', label: 'Home', icon: Zap },
@@ -25,9 +26,7 @@ export default function Navbar() {
                 <nav className="mt-3 glass-card px-4 py-3 flex items-center justify-between">
                     {/* Logo */}
                     <NavLink to="/" className="flex items-center gap-2 group">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-indigo-500 flex items-center justify-center shadow-glow-cyan">
-                            <Zap size={16} className="text-navy-900 fill-navy-900" />
-                        </div>
+                        <img src={logoUrl} alt="" className="h-8 w-auto max-w-[120px] object-contain object-left shrink-0" />
                         <span className="font-bold text-base tracking-tight">
                             <span className="text-gradient-cyan">Nexus</span>
                             <span className="text-nexus-text"> AI</span>
