@@ -1,76 +1,76 @@
-# ⚡ Nexus AI — Resume Optimizer
+# Nexus AI
 
-An AI-powered resume analysis platform that provides enterprise-grade intelligence — surfacing keyword gaps, ATS score, clarity metrics, and STAR-method bullet improvements in seconds.
+**Nexus AI** is a full-stack web application for AI-assisted resume analysis. It accepts PDF or DOCX resumes, returns scoring and feedback (ATS-oriented metrics, strengths, weaknesses, keyword gaps, STAR-style bullet suggestions), and includes a bullet improver and a read-only analysis history view for the UI.
 
-![Nexus AI](https://img.shields.io/badge/Nexus-AI-06b6d4?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTMgMkwzIDE0aDlsLTEgMTAgMTAtMTJoLTlsMi0xMHoiIGZpbGw9IiMwNmI2ZDQiLz48L3N2Zz4=)
-![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
-![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=flat-square&logo=node.js)
-![TailwindCSS](https://img.shields.io/badge/Tailwind-CSS-06B6D4?style=flat-square&logo=tailwindcss)
+Repository: [github.com/mananjani2102/Nexus-AI](https://github.com/mananjani2102/Nexus-AI)
 
-## 🚀 Features
+---
 
-- **ATS Score Analysis** — Evaluate how well your resume performs against Applicant Tracking Systems
-- **Keyword Gap Detection** — Identify missing keywords for your target role
-- **Clarity Score** — Get feedback on readability and impact of your content
-- **STAR Bullet Improver** — AI-powered bullet point rewriting using the STAR method
-- **Analysis History** — Track your resume score improvements over time
-- **Beautiful Dashboard** — Interactive visualizations with sparkline charts
+## Description
 
-## 🛠️ Tech Stack
+The product pairs a **React (Vite)** client with an **Express** REST API. The backend extracts text from uploads (PDF via `pdf-parse`; DOCX via a basic buffer read in the current implementation), invokes an LLM orchestration layer, and returns structured JSON. The frontend consumes these endpoints through a small Axios service layer and presents dashboards, upload flows, and suggestions.
 
-| Layer      | Technology                              |
-| ---------- | --------------------------------------- |
-| Frontend   | React 19, Vite, Tailwind CSS, Framer Motion |
-| Backend    | Node.js, Express.js                     |
-| AI Engine  | Google Gemini API                       |
-| Icons      | Lucide React                            |
+---
 
-## 📦 Project Structure
+## Features
 
-```
-Nexus-AI/
-├── frontend/               # React + Vite frontend
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── pages/          # Route-level page components
-│   │   ├── context/        # React context providers
-│   │   └── services/       # API service layer
-│   └── public/             # Static assets
-├── backend/                # Express.js API server
-│   ├── controllers/        # Route handler logic
-│   ├── routes/             # Express route definitions
-│   └── utils/              # Utility functions (LLM integration)
-└── README.md
-```
+- Resume upload (PDF and DOCX, server-side validation and size limit)
+- Role-aware analysis with overall, ATS, and clarity scores
+- Strengths, weaknesses, and ATS keyword gap lists
+- STAR-method bullet mapping suggestions in the analysis payload
+- Dedicated **Bullet Pro** endpoint to rewrite a single bullet with metrics
+- **History** API returning past analyses (currently served from in-memory mock data)
+- Responsive UI with Tailwind CSS v4, Framer Motion, and Lucide icons
+- Health check endpoint for monitoring and smoke tests
 
-## ⚙️ Getting Started
+---
+
+## Tech Stack
+
+| Area | Technologies |
+|------|----------------|
+| **Project type** | Full-stack (REST API + SPA) |
+| **Frontend** | React 19, Vite 7, React Router 7, Tailwind CSS 4 (`@tailwindcss/vite`), Framer Motion, Lucide React, Axios |
+| **Backend** | Node.js, Express 4, Multer, `pdf-parse`, `dotenv`, `cors` |
+| **Database** | None (history is mock data in the current backend) |
+| **Authentication** | None |
+| **AI / LLM** | `backend/utils/llm.js` provides a **simulated** `callLLM` implementation; `GEMINI_API_KEY` is defined in `.env.example` for intended future Gemini integration |
+
+---
+
+## Installation and Setup
 
 ### Prerequisites
 
-- Node.js v18+
-- npm or yarn
-- Google Gemini API Key
+- **Node.js** 18 or newer (LTS recommended)
+- **npm** (ships with Node)
 
-### 1. Clone the Repository
+### Clone the repository
 
 ```bash
 git clone https://github.com/mananjani2102/Nexus-AI.git
 cd Nexus-AI
 ```
 
-### 2. Backend Setup
+### Backend
 
 ```bash
 cd backend
 npm install
 cp .env.example .env
-# Add your Gemini API key to .env
+```
+
+On Windows PowerShell: `Copy-Item .env.example .env`
+
+Edit `.env` (see [Environment variables](#environment-variables)). Then:
+
+```bash
 npm run dev
 ```
 
-The backend will start at `http://localhost:4000`
+The API listens on **`http://localhost:4000`** by default (`PORT` in `.env`).
 
-### 3. Frontend Setup
+### Frontend
 
 ```bash
 cd frontend
@@ -78,17 +78,233 @@ npm install
 npm run dev
 ```
 
-The frontend will start at `http://localhost:5173`
+The app runs at **`http://localhost:5173`** by default. The API client in `frontend/src/services/api.js` uses **`http://localhost:4000/api`** directly. Vite also defines a **`/api` proxy** to port `4000`, which you can use by pointing `baseURL` at a relative path (e.g. `/api`) if you prefer to avoid hard-coded origins in dev.
 
-## 🔐 Environment Variables
+### Production build (frontend)
 
-Create a `.env` file in the `backend/` directory:
-
-```env
-PORT=4000
-GEMINI_API_KEY=your_gemini_api_key_here
+```bash
+cd frontend
+npm run build
+npm run preview
 ```
 
-## 📄 License
+For production, set the API base URL to your deployed backend (today the client uses `http://localhost:4000/api` in `frontend/src/services/api.js`).
 
-This project is licensed under the ISC License.
+---
+
+## API documentation
+
+**Base URL (local):** `http://localhost:4000/api`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/health` | Service health and version metadata |
+| `POST` | `/api/analyze` | Multipart upload: resume file + `jobRole` |
+| `POST` | `/api/improve-bullet` | JSON body: `bullet`, optional `jobRole` |
+| `GET` | `/api/history` | List of mock history entries (newest first) |
+
+There are **no** `PUT` or `DELETE` routes in the current codebase.
+
+### `GET /api/health`
+
+**Response** `200 OK`
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-03-28T12:00:00.000Z",
+  "version": "1.0.0"
+}
+```
+
+### `POST /api/analyze`
+
+**Content-Type:** `multipart/form-data`
+
+| Field | Type | Required | Notes |
+|-------|------|----------|--------|
+| `resume` | file | Yes | PDF or DOCX, max **5 MB** |
+| `jobRole` | string | No | Defaults to `Software Engineer` |
+
+**Success** `200 OK` — body shape returned by `callLLM` (example):
+
+```json
+{
+  "overall_score": 72,
+  "ats_score": 68,
+  "clarity_score": 81,
+  "strengths": ["..."],
+  "weaknesses": ["..."],
+  "ats_keywords_missing": ["CI/CD", "Kubernetes"],
+  "star_bullets": {
+    "Worked on the website front-end": "Led front-end development..."
+  }
+}
+```
+
+**Error examples**
+
+```json
+{ "error": "No file uploaded. Please attach a resume." }
+```
+
+```json
+{ "error": "Could not extract readable text from the resume. Please ensure the file is not scanned or image-based." }
+```
+
+### `POST /api/improve-bullet`
+
+**Content-Type:** `application/json`
+
+```json
+{
+  "bullet": "Maintained the internal dashboard for the sales team.",
+  "jobRole": "Software Engineer"
+}
+```
+
+**Success** `200 OK`
+
+```json
+{
+  "improved": "Architected and maintained...",
+  "metrics": {
+    "situation": "...",
+    "action": "...",
+    "result": "...",
+    "impact_score": 8
+  }
+}
+```
+
+### `GET /api/history`
+
+**Success** `200 OK` — JSON array of objects with fields such as `id`, `filename`, `job_role`, `date`, `overall_score`, `ats_score`, `clarity_score`, `score_history`, `keywords_missing`.
+
+---
+
+## Folder structure
+
+```text
+Nexus-AI/
+├── README.md
+├── backend/
+│   ├── server.js
+│   ├── package.json
+│   ├── .env.example
+│   ├── controllers/
+│   │   ├── analyzeController.js
+│   │   ├── bulletController.js
+│   │   └── historyController.js
+│   ├── routes/
+│   │   ├── analyze.js
+│   │   ├── bullet.js
+│   │   └── history.js
+│   └── utils/
+│       └── llm.js
+└── frontend/
+    ├── index.html
+    ├── package.json
+    ├── vite.config.js
+    ├── tailwind.config.js
+    ├── postcss.config.js
+    ├── public/
+    ├── src/
+    │   ├── main.jsx
+    │   ├── App.jsx
+    │   ├── App.css
+    │   ├── index.css
+    │   ├── components/
+    │   │   ├── Navbar.jsx
+    │   │   ├── PageWrapper.jsx
+    │   │   ├── ErrorBanner.jsx
+    │   │   ├── DemoVideoPlayer.jsx
+    │   │   └── ScoreRing.jsx
+    │   ├── pages/
+    │   │   ├── LandingPage.jsx
+    │   │   ├── UploadPage.jsx
+    │   │   ├── DashboardPage.jsx
+    │   │   ├── SuggestionsPage.jsx
+    │   │   ├── BulletImproverPage.jsx
+    │   │   └── HistoryPage.jsx
+    │   ├── context/
+    │   │   └── ResumeContext.jsx
+    │   ├── services/
+    │   │   └── api.js
+    │   └── assets/
+    │       ├── nexus-logo-01.png
+    │       └── react.svg
+    └── eslint.config.js
+```
+
+---
+
+## Environment variables
+
+Create **`backend/.env`** (copy from `backend/.env.example`).
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `PORT` | No | HTTP port for Express. Default: `4000` |
+| `GEMINI_API_KEY` | No* | Placeholder in `.env.example` for future Google Gemini usage; **not read** by the current `llm.js` implementation |
+
+\*The running app works without `GEMINI_API_KEY` because analysis uses the simulated `callLLM` helper until a real provider is wired in.
+
+The frontend has **no** `.env` file in the repository; API base URL is set in code for local development.
+
+---
+
+## Error handling
+
+- **Express JSON body** limit: `10mb` (see `server.js`).
+- **Unknown routes:** `404` with `{ "error": "Endpoint not found" }`.
+- **Unhandled errors:** Global middleware returns `err.status` or `500` with `{ "error": "<message>" }`.
+- **Analyze route:** `400` for missing file; `422` for insufficient extracted text; `500` on analysis failure with message prefixed `Analysis failed:`.
+- **Bullet route:** `400` for missing or too-short bullet; `500` on failure.
+- **Multer:** Rejects disallowed MIME types with an error passed through the upload middleware.
+
+---
+
+## Deployment
+
+This README documents **local** execution. For production:
+
+1. **Backend:** Deploy the `backend` folder to any Node.js host (e.g. Render, Railway, Fly.io, AWS EC2/Elastic Beanstalk). Set `PORT` as required by the platform and configure CORS in `server.js` if the frontend origin changes.
+2. **Frontend:** Build static assets (`npm run build`) and host on any static host (e.g. Netlify, Vercel, S3 + CloudFront). Update **`frontend/src/services/api.js`** `baseURL` to the public API origin, or introduce an environment-based configuration pattern.
+3. **Secrets:** Never commit `.env`; configure secrets in the hosting provider’s dashboard.
+
+A Netlify URL has been associated with this project in repository metadata; treat hosting choices as environment-specific.
+
+---
+
+## Future improvements
+
+- Persist analysis history in a real database and scope it by user or session.
+- Replace simulated `callLLM` with Google Gemini (or another provider) using `GEMINI_API_KEY`.
+- Robust DOCX text extraction (e.g. dedicated library instead of raw buffer read).
+- JWT or OAuth for authenticated uploads and history.
+- Centralized API base URL via `import.meta.env` / build-time env for frontend.
+- Automated tests (API integration and UI).
+
+---
+
+## Contributing
+
+1. Fork the repository and create a feature branch from `main`.
+2. Keep changes focused; follow existing code style in `frontend` and `backend`.
+3. Do not commit secrets or large generated artifacts.
+4. Open a pull request with a clear description of behavior changes and any new environment variables.
+
+---
+
+## License
+
+Backend `package.json` declares **ISC**. Confirm `LICENSE` file in the repository if your organization requires an explicit license text; otherwise default to the terms stated in `package.json` and this README.
+
+---
+
+## Author
+
+**[mananjani2102](https://github.com/mananjani2102)** — [Nexus-AI on GitHub](https://github.com/mananjani2102/Nexus-AI)
+
+For questions or collaboration, use GitHub Issues or Pull Requests on the repository above.
